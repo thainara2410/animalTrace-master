@@ -1,9 +1,5 @@
 # Animal Trace
-
-#### Integrantes do Grupo:
-- Thainara Rocha Cruz
-- Jhennifer Aparecida Rodrigues Borges
-- Beatriz Fernandes Teixeira
+---
 ---
 ## Introdução
 Este projeto consiste em uma aplicação que permite o monitoramento de animais numa fazenda utilizando um mapa interativo do Google Maps para permitir que o usuário selecione a região a ser monitorada. As coordenadas do polígono que representam a propriedade são salvas em um banco de dados SQLite. Após a região ser delimitada, é possível adicionar o identificador MAC de um dispositivo (ESP32) acoplado a um animal. O ESP32 é um arduino que se conecta com o Firebase e envia constantemente a localização (as coordenadas geográficas) para este banco de dados em nuvem. A partir dos dados enviados pelo ESP32, a aplicação principal em Django consome o Firebase a partir de sua API e plota a movimentação do animal no mapa.
