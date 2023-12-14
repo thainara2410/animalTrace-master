@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapa do Google</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        header{            
+            display: flex;
+            align-items: center;
+            background: #417690;
+            color:  #FFFFCC;
+            height: 8vh;
+            width: 100vw;
+        }
+        body{
+            overflow: hidden;
+            background-color: #d5d5d5;
+        }
+        button{            
+            border:  none;
+            background: none;
+            color:  #FFFFCC;
+            display: flex;
+            align-self: center;
+            font-size: x-large;
+        }
+       
+        h3{
+            align-self: center;
+            text-align: center;
+            width: 100%;
+        }
+        
+        #map {
+            height: 73vh;
+            margin-bottom: 20px;
+        }
+    </style>
+    <!-- Styles -->
+
+    <!-- Scripts -->
+    <script defer>
+        var mapa
+        var poligono = "";
+
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: -21.227867, lng: -44.9811239 },
+                zoom: 15,
+            });
+            const drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    drawingModes: [
+                        google.maps.drawing.OverlayType.POLYGON,
+                    ],
+                },
+                markerOptions: {
+                    icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+                },
+            });
+
+            drawingManager.setMap(map);
+            mapa = map
+            google.maps.event.addListener(drawingManager, "overlaycomplete", function (event) {
+                if (event.type === google.maps.drawing.OverlayType.POLYGON) {
+                    poligono = event.overlay.getPath().getArray()
+                }
+            });
+        }
+
+        function salvarCoordenadas() {
+            if (poligono != "") {
+                var arrayCoordenadas = poligono.map(function(coord) {
+                    return { latitude: coord.lat(), longitude: coord.lng() };
+                });
+                var jsonCoordenadas = JSON.stringify(arrayCoordenadas, null, 2);
+
+                fetch('http://localhost:8000/coordenadas/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: jsonCoordenadas,
+                }).then(response => response.json()).then(data => {
+                    var userResponse = window.confirm('Coordenadas salvas com sucesso!\nDeseja ir para o painel de controle?');
+
+                    if (userResponse) {
+                        // Redirecionar para o painel de controle
+                        window.location.href = 'http://localhost:8000/mapa_controle';
+                    } else {
+                        // Limpar o desenho no mapa
+                        window.location.reload();
+                    }
+                }).catch(error => {
+                    alert('Não foi possível salvar a região delimitada!')
+                });
+            } else {
+                alert('Desenhe um polígono primeiro.')
+            }
+        }
+
+        function pesquisar() {
+            var endereco = document.getElementById('endereco').value
+
+            var geocoder = new google.maps.Geocoder()
+            geocoder.geocode({ address: endereco }, function (results, status) {
+                if (status === 'OK') {
+                    var lat = results[0].geometry.location.lat();
+                    var lng = results[0].geometry.location.lng();
+
+                    var posicao = new google.maps.LatLng(lat, lng);
+                    mapa.setCenter(posicao);
+                    mapa.setZoom(14);
+                    new google.maps.Marker({
+                        position: posicao,
+                        map: mapa,
+                    });
+                } else {
+                    alert('Não foi possível encontrar o endereço.');
+                }
+            });
+        }
+
+        function abrirPainel() {
+            window.location.href = 'http://localhost:8000/mapa_controle';
+        }
+
+        function verificarEnter(event) {
+            if (event.key === 'Enter') {
+                pesquisar();
+            }
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap&libraries=drawing"></script>
+    <!-- Scripts -->
+</head>
+
+<body>
+    <header>
+        <button onclick="window.history.back();"><i class="fa-solid fa-arrow-left"></i></button>
+        <h3>Cadastro de região</h3>
+    </header>
+    <div class="container-principal">
+        <div class="row justify-content-center mt-2">
+            <div class="px-5">
+                <div class="input-group mb-3">
+                    <input type="text" id="endereco" class="form-control" placeholder="Digite um endereço" onkeypress="verificarEnter(event)"/>
+                    <button onclick="pesquisar()" class="btn btn-primary">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="px-5">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="d-flex flex-row w-100 justify-content-between px-5">
+            <button onclick="abrirPainel()" class="btn btn-primary">Ir para o painel de controle</button>
+            <button onclick="salvarCoordenadas()" class="btn btn-primary">Salvar Coordenadas</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+django
+python-decouple
+pyrebase4
+django-cors-headers
