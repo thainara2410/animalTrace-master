@@ -8,11 +8,11 @@ Este projeto consiste em uma aplicação que permite o monitoramento de animais 
 - **Integração com Dispositivos IoT:** Facilitar o monitoramento em tempo real por meio da conexão de dispositivos ESP32 acoplados aos animais.
 
 ---
-## Arquitetura do Sistema Distribuído (Cliente-servidor)
+## Arquitetura do Sistema 
 
-#### **Tipo de arquitetura de sistemas distribuídos**
+#### **Tipo de arquitetura de sistema**
 
-O tipo de arquitetura de sistemas distribuídos utilizado para este projeto é uma arquitetura **cliente-servidor**. Nesse tipo de arquitetura, os componentes do sistema são divididos em dois tipos: clientes e servidores. Os clientes solicitam serviços aos servidores, que fornecem esses serviços.
+O tipo de arquitetura de sistemas utilizado para este projeto é uma arquitetura **cliente-servidor**. Nesse tipo de arquitetura, os componentes do sistema são divididos em dois tipos: clientes e servidores. Os clientes solicitam serviços aos servidores, que fornecem esses serviços.
 
 Os clientes são **os dispositivos ESP32**, que enviam as coordenadas geográficas dos animais para o servidor Firebase,  um servidor em nuvem que armazena os dados enviados pelos clientes. **A aplicação Django** é um cliente que acessa os dados armazenados no servidor Firebase e os utiliza para plotar a movimentação dos animais no mapa.
 
